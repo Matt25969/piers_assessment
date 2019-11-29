@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block body_content %}
+<div class="register">
+        <form method="POST" action="">
+            {{  forms.RegisterForm.hidden_tag() }}
+            <div class="register-group">
+                {{ forms.RegisterForm.user_name.label }}
+                {% if  forms.RegisterForm.user_name.errors %}
+                    {{  forms.RegisterForm.user_name }}
+                    <div class="error">
+                        {% for error in forms.RegisterForm.user_name.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{  forms.RegisterForm.user_name }}
+                {% endif %}
+            </div>
+            <br>
+            <div class="register-group">
+                {{ forms.RegisterForm.first_name.label }}
+                {% if  forms.RegisterForm.first_name.errors %}
+                    {{  forms.RegisterForm.first_name }}
+                    <div class="error">
+                        {% for error in forms.RegisterForm.first_name.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{  forms.RegisterForm.first_name }}
+                {% endif %}
+            </div>
+            <br>
+            <div class="register-group">
+                {{ forms.RegisterForm.last_name.label }}
+                {% if  forms.RegisterForm.last_name.errors %}
+                    {{  forms.RegisterForm.last_name }}
+                    <div class="error">
+                        {% for error in forms.RegisterForm.last_name.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{  forms.RegisterForm.last_name }}
+                {% endif %}
+            </div>
+            <br>
+            '''PASWORDS'''
+{% endblock body_content %}

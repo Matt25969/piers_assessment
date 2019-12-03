@@ -1,4 +1,4 @@
-from wtforms import StringField, SubmitField, IntegerField
+from wtforms import StringField, SubmitField, IntegerField, PasswordField, BooleanField
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired, Length
 
@@ -7,22 +7,16 @@ class LoginForm(FlaskForm):
         validators=[DataRequired(message=None), Length(min=2, max=30)
         ]    
     )
-    password = StringField('Password: ',
+    password = PasswordField('Password: ',
         validators=[DataRequired(message=None), Length(min=5, max=30)
         ]    
     )
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Sign in')
 
 class RegisterForm(FlaskForm):
     user_name = StringField('User name: ',
         validators=[DataRequired(message=None), Length(min=2, max=30)
-        ]    
-    )
-    password = StringField('Password: ',
-        validators=[DataRequired(message=None), Length(min=5, max=30)
-        ]    
-    )
-    confirm-password = StringField('please confirm your password: ',
-        validators=[DataRequired(message=None), Length(min=5, max=30)
         ]    
     )
     first_name = StringField('First name: ',
@@ -33,6 +27,20 @@ class RegisterForm(FlaskForm):
         validators=[DataRequired(message=None), Length(min=2, max=30)
         ]    
     )
+    password = PasswordField('Password: ',
+        validators=[DataRequired(message=None), Length(min=5, max=30)
+        ]    
+    )
+    confirm-password = PasswordField('Please confirm your password: ',
+        validators=[DataRequired(message=None), Length(min=5, max=30), EqualTo('password')
+        ]    
+    )
+    
+    def validate_user_name(self, user_name):
+        user = users.query.filter_by(user_name=user_name.data).first()
+        
+        if user:
+            raise ValidationError('User name is already in use!')
 
 class CreateCard(FlaskForm):
     card_name = StringField('Card Name: ',
@@ -48,7 +56,7 @@ class CreateCard(FlaskForm):
         ]    
     )
 
-class Createdeck(FlaskForm):
+class CreateDeck(FlaskForm):
     deck_name = StringField('Deck name: ',
     validators=[DataRequired(message=None), Length(min=2, max=30)
         ]    

@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for
 from application import app, db
-from application import models
-from application import forms
+from application.models import users, card_list, deck_list
+from application.forms import RegisterForm, LoginForm, CreateCard, Createdeck
 from application import password_hash as pw
 
 @app.route('/')
@@ -9,31 +9,46 @@ from application import password_hash as pw
 def home():
 	return render_template('home.html', title='Home')
 
-@app.route('/login')
+@app.route('/login', methods=['GET','POST'])
 def login():
-	return render_template('login.html', title='Login')
+    if current_user.is_authenticated:
+		return redirect(url_for('home'))
 
-@app.route('/register')
+	form = LoginForm()
+	if form.validate_on_submit():
+		user = users.query.filter_by(user_name=form.user_name.data).first()
+		if user and pw.verify_password(user.password, form.password.data):
+			login_user(user, remember=form.remember.data)
+			next_page = request.args.get('next')
+
+			if next_page:
+				return redirect(next_page)
+			else:
+				return redirect(url_for('home'))
+
+	return render_template('login.html', title='Login', form=form)
+
+@app.route('/register', methods=['GET','POST'])
 def register():
-    newuser = forms.RegisterForm()
-    hashed = pw.hash_password(forms.RegisterForm.password.data)
+    if current_user.is_authenticated:
+		return redirect(url_for('home'))
+    newuser = RegisterForm()
     if newuser.validate_on_submit():
-        user = models.users(
-            user_name=forms.RegisterForm.user_name.data,
-            first_name=forms.RegisterForm.first_name.data,
-            last_name=forms.RegisterForm.last_name.data,
+        hashed = pw.hash_password(RegisterForm.password.data)
+        user = users(
+            user_name=RegisterForm.user_name.data,
+            first_name=RegisterForm.first_name.data,
+            last_name=RegisterForm.last_name.data,
             password=hashed
-            admin=False
         )
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('login'))
     else:
-        print(forms.RegisterForm.errors)
-        return render_template('register.html', title='Register', form=forms.RegisterForm)
-
-	return render_template('register.html', title='Register')
+        print(RegisterForm.errors)
+        return render_template('register.html', title='Register', form=RegisterForm)
 
 @app.route('/dashboard')
-def register():
+@login_required
+def dashboard():
 	return render_template('dashboard.html', title='Dashboard')
